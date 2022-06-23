@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"protobuf-lesson/pb"
 
-	"google.golang.org/protobuf/proto"
+	"github.com/golang/protobuf/jsonpb"
 )
 
 func main() {
@@ -29,31 +28,53 @@ func main() {
 		},
 	}
 
-	//インスタンスができたので、上記Employee構造体をシリアライズして、バイナリーファイルとして書き出す
-	binData, err := proto.Marshal(employee)
+	/*
+		//インスタンスができたので、上記Employee構造体をシリアライズして、バイナリーファイルとして書き出す
+		binData, err := proto.Marshal(employee)
+		if err != nil {
+			log.Fatalln("Can't serialize", err)
+		}
+
+		//シリアライズされたのでファイルに書き出す
+		if err := ioutil.WriteFile("test.bin", binData, 0666); err != nil {
+			log.Fatalln("Can't write", err)
+		}
+
+		//test.binからバイナリーデータを読み込み、変数inに代入
+		in, err := ioutil.ReadFile("test.bin")
+		if err != nil {
+			log.Fatalln("Can't read file", err)
+		}
+
+		readEmployee := &pb.Employee{}
+
+		//変数inの中にあるバイナリーデータがでシリアライズされ、上記で生成した空の構造体に入る
+		err = proto.Unmarshal(in, readEmployee)
+		if err != nil {
+			log.Fatalln("Can't deserialize", err)
+		}
+
+		//ちゃんとデシリアライズされているか確認
+		fmt.Println(readEmployee)
+	*/
+
+	//json文字列データに変換
+	m := jsonpb.Marshaler{}
+	out, err := m.MarshalToString(employee) //引数データをjson文字列に変換する
 	if err != nil {
-		log.Fatalln("Can't serialize", err)
+		log.Fatalln("Can't marshal to json", err)
 	}
 
-	//シリアライズされたのでファイルに書き出す
-	if err := ioutil.WriteFile("test.bin", binData, 0666); err != nil {
-		log.Fatalln("Can't write", err)
-	}
+	/*
+		//ちゃんとjson文字列に変換されているか確認
+		fmt.Println(out)
+	*/
 
-	//test.binからバイナリーデータを読み込み、変数inに代入
-	in, err := ioutil.ReadFile("test.bin")
-	if err != nil {
-		log.Fatalln("Can't read file", err)
-	}
-
+	//json文字列データから構造体に戻す
 	readEmployee := &pb.Employee{}
-
-	//変数inの中にあるバイナリーデータがでシリアライズされ、上記で生成した空の構造体に入る
-	err = proto.Unmarshal(in, readEmployee)
-	if err != nil {
-		log.Fatalln("Can't deserialize", err)
+	if err := jsonpb.UnmarshalString(out, readEmployee); err != nil { //変数outはjson文字列データなので、それをアンマーシャルして構造体（readEmployee）に代入
+		log.Fatalln("Can't unmarshal from json", err)
 	}
 
-	//ちゃんとデシリアライズされているか確認
 	fmt.Println(readEmployee)
 }
