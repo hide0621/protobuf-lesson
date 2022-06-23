@@ -1,0 +1,38 @@
+syntax = "proto3"; // ;を忘れるとデフォルトでproto2となってしまう
+
+//protoファイルの名前空間を定義
+package employee;
+
+//変換後のgoファイルのパッケージを指定（pbパッケージに所属）
+option go_package  = "./pb";
+
+import "proto/data.proto";
+
+//クラスとか構造体みたいなやつ、これらに変換される
+message Employee {
+    int32 id = 1; //番号はタグ番号
+    string name = 2;
+    string email = 3;
+    Occupation occupation = 4;
+    repeated string phone_number = 5; //repeatedをつけたフィールドは配列のように複数の要素を持つことが出来る
+    map<string, Company.Project> project = 6;
+    oneof profile {
+        string text = 7;
+        Video video = 8;
+    }
+    data.Data birthday = 9;
+}
+
+//列挙型（カスタム型）
+enum Occupation {
+    OCCUPATION_UNKNOWN = 0;
+    ENGINEER  = 1;
+    DESIGNER = 2;
+    MANAGER = 3;
+}
+
+message Company {
+    message Project {}
+}
+
+message Video {}
