@@ -15,7 +15,7 @@ message Employee {
     string email = 3;
     Occupation occupation = 4;
     repeated string phone_number = 5; //repeatedをつけたフィールドは配列のように複数の要素を持つことが出来る
-    map<string, Company.Project> project = 6;
+    map<string, Company.Project> project = 6; //キーをstring,値がCompany.Projectのmapで定義
     oneof profile {
         string text = 7;
         Video video = 8;
